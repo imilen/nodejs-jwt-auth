@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import { redisOptionsType } from "../server/db/redis";
 
 dotenv.config({ encoding: "utf8" });
 
@@ -8,10 +9,10 @@ export default {
   cookieSecretKey: JSON.stringify(process.env.COOKIE_SECRET_KEY) || "$3cr37",
   redis: {
     host: JSON.stringify(process.env.REDIS_DB) || "localhost",
-    port: JSON.stringify(process.env.REDIS_DB) || "6379",
+    port: +JSON.stringify(process.env.REDIS_DB) || 6379,
     pass: JSON.stringify(process.env.REDIS_DB) || "",
-    db: JSON.stringify(process.env.REDIS_DB) || "0",
-  },
+    db: +JSON.stringify(process.env.REDIS_DB) || 0,
+  } as redisOptionsType,
   mongo: {
     uri:
       JSON.stringify(process.env.MONGODB_URI) ||

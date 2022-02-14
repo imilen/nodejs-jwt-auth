@@ -28,6 +28,7 @@ const jksJs = require("jks-js");
 import { log } from "./utils";
 import { index } from "./routes/index";
 import { mongoConnect } from "./db/mongo";
+import { redisClient } from "./db/redis";
 
 // extract configuration options
 const port = config.get<number>("port");
@@ -40,6 +41,7 @@ const mongo = config.get<{ uri: string; options: object }>("mongo");
 function main(): Express {
   // app
   const app = express();
+  const RedisStore = connectRedis(expressSession);
 
   // app set
   app.set("view engine", "ejs");
@@ -68,6 +70,11 @@ function main(): Express {
       rolling: false,
       resave: false,
       saveUninitialized: false,
+      store: new RedisStore({
+        client: redisClient,
+        disableTouch: true,
+        ttl: ms(refreshTokenTtl) / 1000,
+      }),
     })
   );
 
