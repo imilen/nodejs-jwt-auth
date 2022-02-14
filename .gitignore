@@ -1,0 +1,8 @@
+node_modules
+temp
+*.cer
+*.csr
+*.key
+*.p12
+*.pub
+*.pem
