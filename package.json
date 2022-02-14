@@ -1,7 +1,7 @@
 {
   "name": "jwt-auth",
   "version": "1.0.0",
-  "description": "JWT authentication, authorization and blocking a token on logout until expires",
+  "description": "JWT authentication, authorization",
   "scripts": {
     "start": "ts-node-dev --respawn --transpile-only server/app.ts"
   },
