@@ -1,0 +1,27 @@
+button {
+    margin: 2px;
+}
+
+.wrapper-box {
+    height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-content: center; 
+    align-items: center;
+}
+
+.wrapper-box .box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#response {
+    white-space: pre;
+    display: flex;
+    width: 50%;
+    overflow: auto;
+    border: 1px solid grey;
+    font-family: monospace;
+}

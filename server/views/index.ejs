@@ -7,11 +7,50 @@
           content="IE=edge">
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>JWT</title>
+    <link rel="stylesheet"
+          href="./style.css">
 </head>
 
 <body>
-    <h1>ExpressJS</h1>
+    <div class="wrapper-box">
+        <div class="box">
+            <button onclick="register({email: 'user@demo.com',password: '1234567890'})">
+                Register
+            </button>
+            <button onclick="login({email: 'user@demo.com',password: '1234567890'})">
+                Login
+            </button>
+        </div>
+
+        ***
+
+        <div class="box">
+            <button onclick="register({email: 'admin@demo.com',password: '1234567890', role: 'admin'})">
+                Register as admin
+            </button>
+            <button onclick="login({email: 'admin@demo.com',password: '1234567890'})">
+                Login as admin
+            </button>
+            <button onclick="admin()">Admin</button>
+        </div>
+
+        ***
+
+        <div class="box">
+            <button onclick="logout()">Logout</button>
+            <button onclick="newToken()">New Token</button>
+        </div>
+
+        ***
+
+        <p><b>### Response ###</b></p>
+        <div id="response"></div>
+    </div>
+
+
+    <script type="application/javascript"
+            src="./main.js"></script>
 </body>
 
 </html>
