@@ -27,6 +27,7 @@ const jksJs = require("jks-js");
 
 import { log } from "./utils";
 import { index } from "./routes/index";
+import { mongoConnect } from "./db/mongo";
 
 // extract configuration options
 const port = config.get<number>("port");
@@ -77,15 +78,16 @@ function main(): Express {
   // routes
   app.use("/", index);
 
+  // database
+  mongoConnect(mongo.uri, mongo.options);
+
   return app;
 }
 
 // http server
 const httpServer = http.createServer(main());
 httpServer.listen(port);
-httpServer.on("listening", () => log.info(`server:listening: ${port} 🔓`));
+httpServer.on("listening", () => log.info(`server:listening ${port} 🔓`));
 httpServer.on("error", (error) =>
   log.error("server:error: " + JSON.stringify(error))
 );
-
-// database
