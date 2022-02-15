@@ -82,14 +82,7 @@ schema.static("isLoggedIn", function (id): Promise<UserDocument | null> {
 
 // hooks
 schema.pre("save", async function (): Promise<void> {
-  log.info(`pre:save:${this.modelName}`);
+  log.info(`pre:save ${this}`);
 });
-
-schema.post(
-  "save",
-  async function (error: any, res: any, next: any): Promise<void> {
-    log.info(`post:save:${this.modelName}`);
-  }
-);
 
 export const User = mongoose.model<UserDocument, UserModel>("User", schema);

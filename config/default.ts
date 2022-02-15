@@ -22,5 +22,7 @@ export default {
   jwt: {
     accessTokenTtl: JSON.stringify(process.env.ACCESS_TOKEN_TTL) || "10m",
     refreshTokenTtl: JSON.stringify(process.env.REFRESH_TOKEN_TTL) || "1h",
+    accessTokenFlag: JSON.stringify(process.env.ACCESS_TOKEN_FLAG) || "at",
+    refreshTokenFlag: JSON.stringify(process.env.REFRESH_TOKEN_FLAG) || "rt",
   },
 };
