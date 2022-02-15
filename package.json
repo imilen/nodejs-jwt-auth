@@ -6,6 +6,9 @@
     "start": "ts-node-dev --respawn --transpile-only server/app.ts"
   },
   "author": "m.ivanov@email.com",
+  "repository": {
+    "url": "https://github.com/imilen/nodejs-jwt-auth.git"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.1",
