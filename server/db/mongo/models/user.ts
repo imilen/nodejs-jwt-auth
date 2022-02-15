@@ -12,7 +12,7 @@ export interface UserDocument {
 }
 
 export interface UserModel extends mongoose.Model<UserDocument, {}> {
-  register(body: UserDocument): void;
+  register(body: UserDocument): Promise<void>;
   login(body: UserDocument): Promise<UserDocument | null>;
   isLoggedIn(): Promise<UserDocument | null>;
 }

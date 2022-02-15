@@ -29,6 +29,7 @@ import { log } from "./utils";
 import { index } from "./routes/index";
 import { mongoConnect } from "./db/mongo";
 import { redisClient } from "./db/redis";
+import { user } from "./routes/user";
 
 // extract configuration options
 const port = config.get<number>("port");
@@ -84,6 +85,7 @@ function main(): Express {
 
   // routes
   app.use("/", index);
+  app.use("/api/user", user);
 
   // database
   mongoConnect(mongo.uri, mongo.options);
