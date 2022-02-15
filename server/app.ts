@@ -28,7 +28,7 @@ const jksJs = require("jks-js");
 import { generateJwtKeys, log } from "./utils";
 import { mongoConnect } from "./db/mongo";
 import { redisClient } from "./db/redis";
-import { home, user } from "./routes";
+import { admin, home, user } from "./routes";
 
 // extract configuration options
 const port = config.get<number>("port");
@@ -90,6 +90,7 @@ function main(): Express {
   // routes
   app.use("/", home);
   app.use("/api/user", user);
+  app.use("/api/admin", admin);
 
   // database
   mongoConnect(mongo.uri, mongo.options);
