@@ -49,7 +49,7 @@ export async function generateJwtToken(
 
     return jwtToken;
   } catch (error: any) {
-    log.error(`generateToken:${typeToken} ${JSON.stringify(error)}`);
+    log.error(`${generateJwtToken.name}:${typeToken} ${JSON.stringify(error)}`);
     return error;
   }
 }

@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import fs from "fs";
+import jwt, { Jwt, JwtPayload } from "jsonwebtoken";
 import fsPromises from "fs/promises";
 import path from "path";
 import config from "config";
@@ -16,16 +15,11 @@ const { accessTokenTtl, refreshTokenTtl, accessTokenFlag, refreshTokenFlag } =
     refreshTokenFlag: string;
   }>("jwt");
 
-const publicRTKey = fs.readFileSync(
-  path.join(__dirname, `../certificate/jwt/rsa_public.${refreshTokenFlag}.pem`),
-  { encoding: "utf8" }
-);
-
 export async function verifyAccessToken(
   req: Request,
   res: Response,
   next: NextFunction
-) {
+): Promise<void> {
   try {
     const accessToken = req.headers.authorization?.split(" ")[1];
 
@@ -36,7 +30,7 @@ export async function verifyAccessToken(
     const blockedToken = await redisClient.get(`bat:${accessToken}`);
 
     if (blockedToken) {
-      throw "A token is blocked !";
+      throw "The token is blocked !";
     }
 
     const publicATKey = await fsPromises.readFile(
@@ -59,7 +53,24 @@ export async function verifyAccessToken(
 
     next();
   } catch (error) {
-    log.error(verifyAccessToken.name + " " + JSON.stringify(error));
+    log.error(`${verifyAccessToken.name} ` + JSON.stringify(error));
     res.status(400).send({ message: error });
+  }
+}
+
+export async function verifyRefreshToken(refreshToken: string) {
+  try {
+    const publicRTKey = await fsPromises.readFile(
+      path.join(
+        __dirname,
+        `../certificate/jwt/rsa_public.${refreshTokenFlag}.pem`
+      ),
+      { encoding: "utf8" }
+    );
+
+    return jwt.verify(refreshToken, publicRTKey, { algorithms: ["RS256"] });
+  } catch (error) {
+    log.error(`${verifyRefreshToken.name} ` + JSON.stringify(error));
+    return error;
   }
 }
