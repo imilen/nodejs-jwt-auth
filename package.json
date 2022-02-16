@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "JWT authentication, authorization",
   "scripts": {
-    "start": "ts-node-dev --respawn --transpile-only server/app.ts",
+    "start": "ts-node-dev --respawn --transpile-only server/main.ts",
     "test": "jest"
   },
   "author": "m.ivanov@email.com",
