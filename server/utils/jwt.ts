@@ -30,7 +30,10 @@ export async function generateJwtToken(
 
     const privateKeyFilePath = path.join(
       __dirname,
-      `../certificate/jwt/rsa_private.${tokenFlag}.pem`
+      "..",
+      "certificate",
+      "jwt",
+      `rsa_private.${tokenFlag}.pem`
     );
     const privateKey = await fsPromises.readFile(privateKeyFilePath, {
       encoding: "utf8",
@@ -70,12 +73,24 @@ export async function generateJwtKeys(tokenFlag: string): Promise<void> {
     });
 
     await fsPromises.writeFile(
-      path.join(__dirname, `../certificate/jwt/rsa_public.${tokenFlag}.pem`),
+      path.join(
+        __dirname,
+        "..",
+        "certificate",
+        "jwt",
+        `rsa_public.${tokenFlag}.pem`
+      ),
       keyPair.publicKey,
       { encoding: "utf8" }
     );
     await fsPromises.writeFile(
-      path.join(__dirname, `../certificate/jwt/rsa_private.${tokenFlag}.pem`),
+      path.join(
+        __dirname,
+        "..",
+        "certificate",
+        "jwt",
+        `rsa_private.${tokenFlag}.pem`
+      ),
       keyPair.privateKey,
       { encoding: "utf8" }
     );

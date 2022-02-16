@@ -36,7 +36,10 @@ export async function verifyAccessToken(
     const publicATKey = await fsPromises.readFile(
       path.join(
         __dirname,
-        `../certificate/jwt/rsa_public.${accessTokenFlag}.pem`
+        "..",
+        "certificate",
+        "jwt",
+        `rsa_public.${accessTokenFlag}.pem`
       ),
       { encoding: "utf8" }
     );
@@ -65,7 +68,10 @@ export async function verifyRefreshToken(
     const publicRTKey = await fsPromises.readFile(
       path.join(
         __dirname,
-        `../certificate/jwt/rsa_public.${refreshTokenFlag}.pem`
+        "..",
+        "certificate",
+        "jwt",
+        `rsa_public.${refreshTokenFlag}.pem`
       ),
       { encoding: "utf8" }
     );

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "JWT authentication, authorization",
   "scripts": {
-    "start": "ts-node-dev --respawn --transpile-only server/app.ts",
+    "start": "ts-node-dev --respawn --transpile-only server/main.ts",
     "test": "jest"
   },
   "author": "m.ivanov@email.com",
@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "body-parser": "^1.19.1",
+    "body-parser": "^1.19.2",
     "compression": "^1.7.4",
     "config": "^3.3.7",
     "connect-redis": "^6.1.1",
