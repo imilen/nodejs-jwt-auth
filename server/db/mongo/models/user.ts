@@ -1,8 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import bcryptjs from "bcryptjs";
 
-import { log } from "../../../utils";
-
 export const userRoles = ["user", "admin"];
 
 export interface UserDocument {
@@ -12,8 +10,8 @@ export interface UserDocument {
 }
 
 export interface UserModel extends mongoose.Model<UserDocument, {}> {
-  register(body: UserDocument): void;
-  login(body: UserDocument): Promise<UserDocument | null>;
+  register(body: UserDocument): Promise<void>;
+  login(body: UserDocument): Promise<UserDocument>;
   isLoggedIn(): Promise<UserDocument | null>;
 }
 
@@ -22,13 +20,13 @@ const schema = new Schema<UserDocument>(
     email: {
       type: String,
       unique: true,
-      required: [true, "Email is required !"],
+      required: [true, "Email is required!"],
       minlength: [10, "Email length must be between 10 and 100 characters!"],
       maxlength: [100, "Email length must be between 10 and 100 characters!"],
     },
     password: {
       type: String,
-      required: [true, "Password is required !"],
+      required: [true, "Password is required!"],
       minlength: [10, "Password length must be between 10 and 100 characters!"],
       maxlength: [
         100,
@@ -55,15 +53,24 @@ schema.index({ email: "text" }, { name: "email_text", background: true });
 // statics
 schema.static("register", async function (body: UserDocument): Promise<void> {
   let { password, email, role } = body;
-  if (await this.findOne({ email })) throw "This email already exists!";
+
+  if (await this.findOne({ email })) {
+    throw new Error("This email already exists!");
+  }
+
   password = await bcryptjs.hash(password, 10);
   await new User({ email, password, role }).save();
 });
 
 schema.static(
   "login",
-  async function (body: UserDocument): Promise<UserDocument | null> {
+  async function (body: UserDocument): Promise<UserDocument> {
     const { email, password } = body;
+
+    if (!email || !password) {
+      throw new Error("Missing credentials!");
+    }
+
     const result = await User.findOne({ email })
       .select("email password id role")
       .exec();
@@ -72,7 +79,7 @@ schema.static(
       return result;
     }
 
-    throw "Wrong credentials!";
+    throw new Error("Wrong credentials!");
   }
 );
 
@@ -81,15 +88,6 @@ schema.static("isLoggedIn", function (id): Promise<UserDocument | null> {
 });
 
 // hooks
-schema.pre("save", async function (): Promise<void> {
-  log.info(`pre:save:${this.modelName}`);
-});
-
-schema.post(
-  "save",
-  async function (error: any, res: any, next: any): Promise<void> {
-    log.info(`post:save:${this.modelName}`);
-  }
-);
+schema.pre("save", async function (): Promise<void> {});
 
 export const User = mongoose.model<UserDocument, UserModel>("User", schema);

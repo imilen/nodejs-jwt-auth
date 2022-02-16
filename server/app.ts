@@ -25,17 +25,22 @@ import redis from "redis";
 import winston from "winston";
 const jksJs = require("jks-js");
 
-import { log } from "./utils";
-import { index } from "./routes/index";
+import { generateJwtKeys, log } from "./utils";
 import { mongoConnect } from "./db/mongo";
 import { redisClient } from "./db/redis";
+import { admin, home, user } from "./routes";
 
 // extract configuration options
 const port = config.get<number>("port");
 const cookieSecretKey = config.get<string>("cookieSecretKey");
 const cookieName = config.get<string>("cookieName");
-const { accessTokenTtl, refreshTokenTtl } =
-  config.get<{ accessTokenTtl: string; refreshTokenTtl: string }>("jwt");
+const { accessTokenTtl, refreshTokenTtl, accessTokenFlag, refreshTokenFlag } =
+  config.get<{
+    accessTokenTtl: string;
+    refreshTokenTtl: string;
+    accessTokenFlag: string;
+    refreshTokenFlag: string;
+  }>("jwt");
 const mongo = config.get<{ uri: string; options: object }>("mongo");
 
 function main(): Express {
@@ -83,10 +88,16 @@ function main(): Express {
   app.use(responseTime());
 
   // routes
-  app.use("/", index);
+  app.use("/", home);
+  app.use("/api/user", user);
+  app.use("/api/admin", admin);
 
   // database
   mongoConnect(mongo.uri, mongo.options);
+
+  // generate jwt keys - private and public
+  generateJwtKeys(accessTokenFlag);
+  generateJwtKeys(refreshTokenFlag);
 
   return app;
 }
