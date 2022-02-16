@@ -9,8 +9,11 @@ describe("all", () => {
     describe("routes", () => {
       describe("home route", () => {
         it("should return status 200", async () => {
-          const res = await supertest(app).get("/");
-          expect(res.statusCode).toEqual(200);
+          let res = await supertest(app).get("/");
+          expect(res.statusCode).toEqual(301);
+          expect(res.text).toEqual(
+            "Moved Permanently. Redirecting to https://127.0.0.1/"
+          );
         });
       });
     });

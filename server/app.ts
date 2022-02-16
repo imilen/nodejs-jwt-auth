@@ -1,9 +1,6 @@
 import express, { Express } from "express";
 import http from "http";
 import https from "https";
-import fs from "fs";
-import fsP from "fs/promises";
-import dotenv from "dotenv";
 import path from "path";
 import favicon from "serve-favicon";
 import cors from "cors";
@@ -14,17 +11,6 @@ import compression from "compression";
 import ms from "ms";
 import responseTime from "response-time";
 import config from "config";
-import bcryptjs from "bcryptjs";
-import bodyParser from "body-parser";
-import ejs from "ejs";
-import ioredis from "ioredis";
-import jwt from "jsonwebtoken";
-import _ from "lodash";
-import moment from "moment";
-import mongoose from "mongoose";
-import redis from "redis";
-import winston from "winston";
-const jksJs = require("jks-js");
 
 import { generateJwtKeys, log } from "./utils";
 import { mongoConnect } from "./db/mongo";
