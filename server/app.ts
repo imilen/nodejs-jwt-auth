@@ -43,7 +43,7 @@ const { accessTokenTtl, refreshTokenTtl, accessTokenFlag, refreshTokenFlag } =
   }>("jwt");
 const mongo = config.get<{ uri: string; options: object }>("mongo");
 
-function main(): Express {
+export function main(): Express {
   // app
   const app = express();
   const RedisStore = connectRedis(expressSession);
@@ -92,9 +92,6 @@ function main(): Express {
   app.use("/api/user", user);
   app.use("/api/admin", admin);
 
-  // database
-  mongoConnect(mongo.uri, mongo.options);
-
   // generate jwt keys - private and public
   generateJwtKeys(accessTokenFlag);
   generateJwtKeys(refreshTokenFlag);
@@ -109,3 +106,6 @@ httpServer.on("listening", () => log.info(`server:listening ${port} 🔓`));
 httpServer.on("error", (error) =>
   log.error("server:error: " + JSON.stringify(error))
 );
+
+// database
+mongoConnect(mongo.uri, mongo.options);
