@@ -89,6 +89,15 @@ export function main(): Express {
   app.use(compression());
   app.use(responseTime());
 
+  // http -> https
+  app.use(function (req, res, next) {
+    if (!req.secure) {
+      res.redirect(301, `https://${req.hostname}${req.url}`);
+    } else {
+      return next();
+    }
+  });
+
   // routes
   app.use("/", home);
   app.use("/api/user", user);
