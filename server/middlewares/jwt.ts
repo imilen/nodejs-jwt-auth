@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import jwt, { Jwt, JwtPayload } from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import fsPromises from "fs/promises";
 import path from "path";
 import config from "config";

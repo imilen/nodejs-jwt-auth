@@ -8,7 +8,7 @@ mongoose.set("debug", false);
 
 export const mongoConnect = async (uri: string, options: object) => {
   try {
-    await mongoose.connect(uri, options);
+    await mongoose.connect(uri, { ...options });
     log.info("mongo:connect ⚡");
 
     const connection = mongoose.connection;

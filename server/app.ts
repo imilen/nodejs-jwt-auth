@@ -1,8 +1,6 @@
 import express, { Express } from "express";
 import http from "http";
-import fs from "fs";
-import fsP from "fs/promises";
-import dotenv from "dotenv";
+import https from "https";
 import path from "path";
 import favicon from "serve-favicon";
 import cors from "cors";
@@ -13,22 +11,12 @@ import compression from "compression";
 import ms from "ms";
 import responseTime from "response-time";
 import config from "config";
-import bcryptjs from "bcryptjs";
-import bodyParser from "body-parser";
-import ejs from "ejs";
-import ioredis from "ioredis";
-import jwt from "jsonwebtoken";
-import _ from "lodash";
-import moment from "moment";
-import mongoose from "mongoose";
-import redis from "redis";
-import winston from "winston";
-const jksJs = require("jks-js");
 
 import { generateJwtKeys, log } from "./utils";
 import { mongoConnect } from "./db/mongo";
 import { redisClient } from "./db/redis";
 import { admin, home, user } from "./routes";
+import extractFromKS from "./certificate/https/generateKeys";
 
 // extract configuration options
 const port = config.get<number>("port");
@@ -43,7 +31,7 @@ const { accessTokenTtl, refreshTokenTtl, accessTokenFlag, refreshTokenFlag } =
   }>("jwt");
 const mongo = config.get<{ uri: string; options: object }>("mongo");
 
-function main(): Express {
+export function main(): Express {
   // app
   const app = express();
   const RedisStore = connectRedis(expressSession);
@@ -87,13 +75,19 @@ function main(): Express {
   app.use(compression());
   app.use(responseTime());
 
+  // http -> https
+  app.use(function (req, res, next) {
+    if (!req.secure) {
+      res.redirect(301, `https://${req.hostname}${req.url}`);
+    } else {
+      return next();
+    }
+  });
+
   // routes
   app.use("/", home);
   app.use("/api/user", user);
   app.use("/api/admin", admin);
-
-  // database
-  mongoConnect(mongo.uri, mongo.options);
 
   // generate jwt keys - private and public
   generateJwtKeys(accessTokenFlag);
@@ -106,6 +100,23 @@ function main(): Express {
 const httpServer = http.createServer(main());
 httpServer.listen(port);
 httpServer.on("listening", () => log.info(`server:listening ${port} 🔓`));
-httpServer.on("error", (error) =>
-  log.error("server:error: " + JSON.stringify(error))
+httpServer.on("error", (error: any) =>
+  log.error(`server:error: ${error.message}`)
 );
+
+const httpsKeys = extractFromKS();
+const httpsServer = https.createServer(
+  {
+    cert: httpsKeys.cert,
+    key: httpsKeys.key,
+  },
+  main()
+);
+httpsServer.listen(443);
+httpsServer.on("listening", () => log.info(`server:listening: 443 🔐`));
+httpsServer.on("error", (error: any) =>
+  log.error(`server:error: ${error.message}`)
+);
+
+// database
+mongoConnect(mongo.uri, mongo.options);
