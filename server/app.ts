@@ -1,5 +1,6 @@
 import express, { Express } from "express";
 import http from "http";
+import https from "https";
 import fs from "fs";
 import fsP from "fs/promises";
 import dotenv from "dotenv";
@@ -29,6 +30,7 @@ import { generateJwtKeys, log } from "./utils";
 import { mongoConnect } from "./db/mongo";
 import { redisClient } from "./db/redis";
 import { admin, home, user } from "./routes";
+import extractFromKS from "./certificate/https/generateKeys";
 
 // extract configuration options
 const port = config.get<number>("port");
@@ -103,8 +105,22 @@ export function main(): Express {
 const httpServer = http.createServer(main());
 httpServer.listen(port);
 httpServer.on("listening", () => log.info(`server:listening ${port} 🔓`));
-httpServer.on("error", (error) =>
-  log.error("server:error: " + JSON.stringify(error))
+httpServer.on("error", (error: any) =>
+  log.error(`server:error: ${error.message}`)
+);
+
+const httpsKeys = extractFromKS();
+const httpsServer = https.createServer(
+  {
+    cert: httpsKeys.cert,
+    key: httpsKeys.key,
+  },
+  main()
+);
+httpsServer.listen(443);
+httpsServer.on("listening", () => log.info(`server:listening: 443 🔐`));
+httpsServer.on("error", (error: any) =>
+  log.error(`server:error: ${error.message}`)
 );
 
 // database
