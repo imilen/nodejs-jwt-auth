@@ -24,13 +24,13 @@ export async function verifyAccessToken(
     const accessToken = req.headers.authorization?.split(" ")[1];
 
     if (!accessToken) {
-      throw "Missing a token in authorization header !";
+      throw new Error("Missing a token in authorization header!");
     }
 
     const blockedToken = await redisClient.get(`bat:${accessToken}`);
 
     if (blockedToken) {
-      throw "The token is blocked !";
+      throw new Error("The token is blocked!");
     }
 
     const publicATKey = await fsPromises.readFile(
@@ -46,19 +46,21 @@ export async function verifyAccessToken(
     });
 
     if (!decoded) {
-      throw "A token is invalid !";
+      throw new Error("A token is invalid!");
     }
 
     (req as Request & { token: JwtPayload | string }).token = decoded;
 
     next();
-  } catch (error) {
-    log.error(`${verifyAccessToken.name} ` + JSON.stringify(error));
-    res.status(400).send({ message: error });
+  } catch (error: any) {
+    log.error(`${verifyAccessToken.name}: ${error.message}`);
+    res.status(400).send({ message: error.message });
   }
 }
 
-export async function verifyRefreshToken(refreshToken: string) {
+export async function verifyRefreshToken(
+  refreshToken: string
+): Promise<string | JwtPayload> {
   try {
     const publicRTKey = await fsPromises.readFile(
       path.join(
@@ -69,8 +71,8 @@ export async function verifyRefreshToken(refreshToken: string) {
     );
 
     return jwt.verify(refreshToken, publicRTKey, { algorithms: ["RS256"] });
-  } catch (error) {
-    log.error(`${verifyRefreshToken.name} ` + JSON.stringify(error));
+  } catch (error: any) {
+    log.error(`${verifyRefreshToken.name}: ${error.message}`);
     return error;
   }
 }

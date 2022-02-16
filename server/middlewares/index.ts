@@ -6,16 +6,20 @@ import { log } from "../utils";
 export * from "./jwt";
 
 export function isExistsCookie(cookieName: string) {
-  return async function (req: Request, res: Response, next: NextFunction) {
+  return async function (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       if (!req.signedCookies[cookieName]) {
-        throw "Have a problem with refresh token !";
+        throw new Error("Have a problem with refresh token!");
       }
 
       next();
-    } catch (error) {
-      log.error(`${isExistsCookie.name} ` + JSON.stringify(error));
-      res.status(400).send({ message: error });
+    } catch (error: any) {
+      log.error(`${isExistsCookie.name}: ${error.message}`);
+      res.status(400).send({ message: error.message });
     }
   };
 }
@@ -24,12 +28,12 @@ export function isAdmin(req: Request, res: Response, next: NextFunction) {
   try {
     // @ts-ignore
     if (!_.eq(req.token.role, userRoles[1])) {
-      throw "Yor are not a admin !";
+      throw new Error("Yor are not a admin!");
     }
 
     next();
-  } catch (error) {
-    log.error(`${isAdmin.name} ` + JSON.stringify(error));
-    res.status(400).send({ message: error });
+  } catch (error: any) {
+    log.error(`${isAdmin.name}: ${error.message}`);
+    res.status(400).send({ message: error.message });
   }
 }

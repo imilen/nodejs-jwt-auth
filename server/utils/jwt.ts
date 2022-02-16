@@ -18,15 +18,16 @@ const { accessTokenTtl, refreshTokenTtl, accessTokenFlag, refreshTokenFlag } =
   }>("jwt");
 
 export async function generateJwtToken(
-  user: UserDocument | null,
+  user: UserDocument,
   expiresIn: any,
   tokenFlag: string
 ): Promise<string> {
   const typeToken =
-    tokenFlag === accessTokenFlag ? "accessToken" : "refreshToken";
+    tokenFlag === accessTokenFlag ? "access token" : "refresh token";
 
   try {
     const { email, role } = _.pick(user, ["email", "role"]);
+
     const privateKeyFilePath = path.join(
       __dirname,
       `../certificate/jwt/rsa_private.${tokenFlag}.pem`
@@ -44,37 +45,41 @@ export async function generateJwtToken(
     });
 
     if (!jwtToken) {
-      throw `Have a problem with ${typeToken} !`;
+      throw new Error(`Have a problem with ${typeToken}!`);
     }
 
     return jwtToken;
   } catch (error: any) {
-    log.error(`${generateJwtToken.name}:${typeToken} ${JSON.stringify(error)}`);
+    log.error(`${generateJwtToken.name}:${typeToken}: ${error.message}`);
     return error;
   }
 }
 
-export async function generateJwtKeys(tokenFlag: string) {
-  const keyPair = crypto.generateKeyPairSync("rsa", {
-    modulusLength: 1024 * 2,
-    publicKeyEncoding: {
-      type: "pkcs1",
-      format: "pem",
-    },
-    privateKeyEncoding: {
-      type: "pkcs1",
-      format: "pem",
-    },
-  });
+export async function generateJwtKeys(tokenFlag: string): Promise<void> {
+  try {
+    const keyPair = crypto.generateKeyPairSync("rsa", {
+      modulusLength: 1024 * 2,
+      publicKeyEncoding: {
+        type: "pkcs1",
+        format: "pem",
+      },
+      privateKeyEncoding: {
+        type: "pkcs1",
+        format: "pem",
+      },
+    });
 
-  await fsPromises.writeFile(
-    path.join(__dirname, `../certificate/jwt/rsa_public.${tokenFlag}.pem`),
-    keyPair.publicKey,
-    { encoding: "utf8" }
-  );
-  await fsPromises.writeFile(
-    path.join(__dirname, `../certificate/jwt/rsa_private.${tokenFlag}.pem`),
-    keyPair.privateKey,
-    { encoding: "utf8" }
-  );
+    await fsPromises.writeFile(
+      path.join(__dirname, `../certificate/jwt/rsa_public.${tokenFlag}.pem`),
+      keyPair.publicKey,
+      { encoding: "utf8" }
+    );
+    await fsPromises.writeFile(
+      path.join(__dirname, `../certificate/jwt/rsa_private.${tokenFlag}.pem`),
+      keyPair.privateKey,
+      { encoding: "utf8" }
+    );
+  } catch (error: any) {
+    log.error(`${generateJwtKeys.name}: ${error.message}`);
+  }
 }

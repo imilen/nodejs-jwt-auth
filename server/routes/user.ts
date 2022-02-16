@@ -29,26 +29,37 @@ const user = Router();
 user.post("/register", async (req: Request, res: Response) => {
   try {
     await User.register(req.body);
+
     res.send({ message: "Registration successful!" });
-  } catch (error) {
-    log.error("user:register " + JSON.stringify(error));
-    res.status(400).send({ message: error });
+  } catch (error: any) {
+    log.error("user:register: " + error.message);
+    res.status(400).send({ message: error.message });
   }
 });
 
 user.post("/login", async (req: Request, res: Response) => {
   try {
-    const user: UserDocument | null = await User.login(req.body);
+    const user: UserDocument = await User.login(req.body);
+
     const accessToken = await generateJwtToken(
       user,
       accessTokenTtl,
       accessTokenFlag
     );
+
+    if (!accessToken) {
+      throw new Error("Can not generate an access token!");
+    }
+
     const refreshToken = await generateJwtToken(
       user,
       refreshTokenTtl,
       refreshTokenFlag
     );
+
+    if (!refreshToken) {
+      throw new Error("Can not generate a refresh token!");
+    }
 
     // @ts-ignore
     req.session.refreshToken = refreshToken;
@@ -62,9 +73,9 @@ user.post("/login", async (req: Request, res: Response) => {
     };
 
     return res.send(json);
-  } catch (error) {
-    log.error("user:login " + JSON.stringify(error));
-    res.status(400).send({ message: error });
+  } catch (error: any) {
+    log.error("user:login: " + error.message);
+    res.status(400).send({ message: error.message });
   }
 });
 
@@ -100,12 +111,14 @@ user.post(
           if (err) {
             throw "Have a problem with refresh token !";
           }
+
           if (!data || !JSON.parse(data)?.refreshToken) {
             throw "Have a problem with refresh token !";
           }
 
           let { refreshToken } = JSON.parse(data);
           const user = (await verifyRefreshToken(refreshToken)) as UserDocument;
+
           const accessToken = await generateJwtToken(
             user,
             accessTokenTtl,

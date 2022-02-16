@@ -1,8 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import bcryptjs from "bcryptjs";
 
-import { log } from "../../../utils";
-
 export const userRoles = ["user", "admin"];
 
 export interface UserDocument {
@@ -13,7 +11,7 @@ export interface UserDocument {
 
 export interface UserModel extends mongoose.Model<UserDocument, {}> {
   register(body: UserDocument): Promise<void>;
-  login(body: UserDocument): Promise<UserDocument | null>;
+  login(body: UserDocument): Promise<UserDocument>;
   isLoggedIn(): Promise<UserDocument | null>;
 }
 
@@ -55,15 +53,24 @@ schema.index({ email: "text" }, { name: "email_text", background: true });
 // statics
 schema.static("register", async function (body: UserDocument): Promise<void> {
   let { password, email, role } = body;
-  if (await this.findOne({ email })) throw "This email already exists!";
+
+  if (await this.findOne({ email })) {
+    throw new Error("This email already exists!");
+  }
+
   password = await bcryptjs.hash(password, 10);
   await new User({ email, password, role }).save();
 });
 
 schema.static(
   "login",
-  async function (body: UserDocument): Promise<UserDocument | null> {
+  async function (body: UserDocument): Promise<UserDocument> {
     const { email, password } = body;
+
+    if (!email || !password) {
+      throw new Error("Missing credentials!");
+    }
+
     const result = await User.findOne({ email })
       .select("email password id role")
       .exec();
@@ -72,7 +79,7 @@ schema.static(
       return result;
     }
 
-    throw "Wrong credentials!";
+    throw new Error("Wrong credentials!");
   }
 );
 
