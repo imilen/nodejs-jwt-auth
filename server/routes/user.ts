@@ -109,11 +109,11 @@ user.post(
       async (err, data) => {
         try {
           if (err) {
-            throw "Have a problem with refresh token !";
+            throw new Error("Have a problem with refresh token!");
           }
 
           if (!data || !JSON.parse(data)?.refreshToken) {
-            throw "Have a problem with refresh token !";
+            throw new Error("Have a problem with refresh token!");
           }
 
           let { refreshToken } = JSON.parse(data);
@@ -137,9 +137,9 @@ user.post(
           res.status(200).send({
             accessToken,
           });
-        } catch (error) {
-          log.error("user:new:token", error);
-          res.status(400).send({ message: error });
+        } catch (error: any) {
+          log.error(`user:new:token: ${error.message}`);
+          res.status(400).send({ message: error.message });
         }
       }
     );

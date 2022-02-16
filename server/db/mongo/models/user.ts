@@ -20,13 +20,13 @@ const schema = new Schema<UserDocument>(
     email: {
       type: String,
       unique: true,
-      required: [true, "Email is required !"],
+      required: [true, "Email is required!"],
       minlength: [10, "Email length must be between 10 and 100 characters!"],
       maxlength: [100, "Email length must be between 10 and 100 characters!"],
     },
     password: {
       type: String,
-      required: [true, "Password is required !"],
+      required: [true, "Password is required!"],
       minlength: [10, "Password length must be between 10 and 100 characters!"],
       maxlength: [
         100,

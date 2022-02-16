@@ -20,13 +20,13 @@ admin.get(
 
       // @ts-ignore
       if (!_.eq(user.role, userRoles[1])) {
-        throw "Yor are not a admin !";
+        throw new Error("Yor are not a admin!");
       } else {
-        res.send({ message: "You are an admin !", user });
+        res.send({ message: "You are an admin!", user });
       }
-    } catch (error) {
-      log.error("admin " + JSON.stringify(error));
-      res.status(400).send({ message: error });
+    } catch (error: any) {
+      log.error(`admin: ${error.message}`);
+      res.status(400).send({ message: error.message });
     }
   }
 );
