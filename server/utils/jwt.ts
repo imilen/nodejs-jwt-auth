@@ -58,42 +58,43 @@ export async function generateJwtToken(
   }
 }
 
-export async function generateJwtKeys(tokenFlag: string): Promise<void> {
+export function generateJwtKeys() {
   try {
-    const keyPair = crypto.generateKeyPairSync("rsa", {
-      modulusLength: 1024 * 2,
-      publicKeyEncoding: {
-        type: "pkcs1",
-        format: "pem",
-      },
-      privateKeyEncoding: {
-        type: "pkcs1",
-        format: "pem",
-      },
-    });
+    [accessTokenFlag, refreshTokenFlag].forEach(async (tokenFlag) => {
+      const keyPair = crypto.generateKeyPairSync("rsa", {
+        modulusLength: 1024 * 2,
+        publicKeyEncoding: {
+          type: "pkcs1",
+          format: "pem",
+        },
+        privateKeyEncoding: {
+          type: "pkcs1",
+          format: "pem",
+        },
+      });
 
-    await fsPromises.writeFile(
-      path.join(
+      const publicKeyFilePath = path.join(
         __dirname,
         "..",
         "certificate",
         "jwt",
         `rsa_public.${tokenFlag}.pem`
-      ),
-      keyPair.publicKey,
-      { encoding: "utf8" }
-    );
-    await fsPromises.writeFile(
-      path.join(
+      );
+      await fsPromises.writeFile(publicKeyFilePath, keyPair.publicKey, {
+        encoding: "utf8",
+      });
+
+      const privateKeyFilePath = path.join(
         __dirname,
         "..",
         "certificate",
         "jwt",
         `rsa_private.${tokenFlag}.pem`
-      ),
-      keyPair.privateKey,
-      { encoding: "utf8" }
-    );
+      );
+      await fsPromises.writeFile(privateKeyFilePath, keyPair.privateKey, {
+        encoding: "utf8",
+      });
+    });
   } catch (error: any) {
     log.error(`${generateJwtKeys.name}: ${error.message}`);
   }

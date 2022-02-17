@@ -85,5 +85,4 @@ app.use("/api/user", user);
 app.use("/api/admin", admin);
 
 // generate jwt keys - private and public
-generateJwtKeys(accessTokenFlag);
-generateJwtKeys(refreshTokenFlag);
+generateJwtKeys();
