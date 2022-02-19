@@ -27,7 +27,7 @@ export async function verifyAccessToken(
       throw new Error("Missing a token in authorization header!");
     }
 
-    const blockedToken = await redisClient.get(`bat:${accessToken}`);
+    const blockedToken = await redisClient?.get(`bat:${accessToken}`);
 
     if (blockedToken) {
       throw new Error("The token is blocked!");

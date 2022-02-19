@@ -4,7 +4,7 @@ import config from "config";
 
 import { log } from "./utils";
 import { mongoConnect } from "./db/mongo";
-import extractFromKS from "./certificate/https/generateKeys";
+// import extractFromKS from "./certificate/https/generateKeys";
 import { app } from "./app";
 
 // extract configuration options
