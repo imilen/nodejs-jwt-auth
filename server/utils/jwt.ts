@@ -3,7 +3,7 @@ import config from "config";
 import _ from "lodash";
 import path from "path";
 import fsPromises from "fs/promises";
-import crypto from "crypto";
+import forge from "node-forge";
 
 import { UserDocument } from "../db/mongo/models";
 import { log } from "../utils";
@@ -58,42 +58,36 @@ export async function generateJwtToken(
   }
 }
 
-export async function generateJwtKeys(tokenFlag: string): Promise<void> {
+export function generateJwtKeys() {
   try {
-    const keyPair = crypto.generateKeyPairSync("rsa", {
-      modulusLength: 1024 * 2,
-      publicKeyEncoding: {
-        type: "pkcs1",
-        format: "pem",
-      },
-      privateKeyEncoding: {
-        type: "pkcs1",
-        format: "pem",
-      },
-    });
+    [accessTokenFlag, refreshTokenFlag].forEach(async (tokenFlag) => {
+      const keyPair = forge.pki.rsa.generateKeyPair(2 * 1024);
 
-    await fsPromises.writeFile(
-      path.join(
+      const publicKey = forge.pki.publicKeyToPem(keyPair.publicKey);
+      const privateKey = forge.pki.privateKeyToPem(keyPair.privateKey);
+
+      const publicKeyFilePath = path.join(
         __dirname,
         "..",
         "certificate",
         "jwt",
         `rsa_public.${tokenFlag}.pem`
-      ),
-      keyPair.publicKey,
-      { encoding: "utf8" }
-    );
-    await fsPromises.writeFile(
-      path.join(
+      );
+      await fsPromises.writeFile(publicKeyFilePath, publicKey, {
+        encoding: "utf8",
+      });
+
+      const privateKeyFilePath = path.join(
         __dirname,
         "..",
         "certificate",
         "jwt",
         `rsa_private.${tokenFlag}.pem`
-      ),
-      keyPair.privateKey,
-      { encoding: "utf8" }
-    );
+      );
+      await fsPromises.writeFile(privateKeyFilePath, privateKey, {
+        encoding: "utf8",
+      });
+    });
   } catch (error: any) {
     log.error(`${generateJwtKeys.name}: ${error.message}`);
   }

@@ -88,7 +88,7 @@ user.post("/logout", verifyAccessToken, async (req: Request, res: Response) => {
     }
   });
 
-  await redisClient.set(
+  await redisClient?.set(
     `bat:${accessToken}`,
     "true",
     "PX",
@@ -104,7 +104,7 @@ user.post(
   "/new/token",
   isExistsCookie(cookieName),
   (req: Request, res: Response) => {
-    redisClient.get(
+    redisClient?.get(
       `sess:${req.signedCookies[cookieName]}`,
       async (err, data) => {
         try {

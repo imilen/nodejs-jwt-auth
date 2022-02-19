@@ -2,14 +2,31 @@ import supertest from "supertest";
 import each from "jest-each";
 
 import { app } from "../app";
+/**
+ * Mocks
+ */
+jest.mock("ioredis", () => jest.requireActual("ioredis-mock"));
+jest.mock("../utils/jwt", () => {
+  const module = jest.requireActual("../utils/jwt");
+
+  return {
+    ...module,
+    generateJwtKeys: jest.fn(),
+  };
+});
 
 describe("all", () => {
   describe("app", () => {
     describe("routes", () => {
       describe("home route", () => {
-        test("should return status 200", async () => {
+        beforeEach(async () => {});
+        afterEach(async () => {});
+        each`
+          expected
+          ${200}
+        `.test("should return status $expected", async ({ expected }) => {
           let res = await supertest(app).get("/");
-          expect(res.statusCode).toEqual(200);
+          expect(res.statusCode).toEqual(expected);
         });
       });
     });
