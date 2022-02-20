@@ -1,5 +1,6 @@
 node_modules
 temp
+coverage
 *.cer
 *.csr
 *.key
