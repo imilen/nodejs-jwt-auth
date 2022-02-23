@@ -33,18 +33,23 @@ async function register(data) {
 
 async function logout() {
 
+    const accessToken = localStorage.getItem('accessToken');
+    let headers = { 'content-type': 'application/json' };
+
+    headers = {
+        ...headers,
+        ...!!accessToken ? { 'authorization': 'Bearer ' + accessToken } : null
+    }
+
     let res = await fetch('api/user/logout', {
         method: 'post',
-        headers: {
-            // 'content-type': 'application/json',
-            'authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        },
+        headers,
     });
+
     res = await res.json();
     response.innerHTML = JSON.stringify(res, '\n', 2);
 
-    const { accessToken } = res;
-    localStorage.setItem('accessToken', accessToken);
+    localStorage.removeItem('accessToken');
 }
 
 async function admin() {

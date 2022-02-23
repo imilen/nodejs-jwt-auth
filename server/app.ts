@@ -9,22 +9,20 @@ import compression from "compression";
 import ms from "ms";
 import responseTime from "response-time";
 import config from "config";
+import bodyParser from "body-parser";
+import passport from "passport";
 
 import { generateJwtKeys } from "./utils";
 import { redisClient } from "./db/redis";
 import { admin, home, user } from "./routes";
+import { jwtOptionsType, mongoOptionsType } from "../config/default";
 
 // extract configuration options
 const cookieSecretKey = config.get<string>("cookieSecretKey");
 const cookieName = config.get<string>("cookieName");
 const { accessTokenTtl, refreshTokenTtl, accessTokenFlag, refreshTokenFlag } =
-  config.get<{
-    accessTokenTtl: string;
-    refreshTokenTtl: string;
-    accessTokenFlag: string;
-    refreshTokenFlag: string;
-  }>("jwt");
-const mongo = config.get<{ uri: string; options: object }>("mongo");
+  config.get<jwtOptionsType>("jwt");
+const mongo = config.get<mongoOptionsType>("mongo");
 
 // app
 export const app = express();
@@ -40,8 +38,8 @@ app.set("trust proxy", 1);
 // app middleware
 app.use(cors({ origin: "*" }));
 app.use("/", express.static(path.join(__dirname, "public")));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser(cookieSecretKey));
 app.use(
   expressSession({
@@ -65,6 +63,9 @@ app.use(
     }),
   })
 );
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(favicon(path.join(__dirname, "favicon.ico")));
 app.use(compression());

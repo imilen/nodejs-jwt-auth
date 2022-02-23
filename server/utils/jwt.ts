@@ -7,15 +7,11 @@ import forge from "node-forge";
 
 import { UserDocument } from "../db/mongo/models";
 import { log } from "../utils";
+import { jwtOptionsType } from "../../config/default";
 
 // extract configuration options
 const { accessTokenTtl, refreshTokenTtl, accessTokenFlag, refreshTokenFlag } =
-  config.get<{
-    accessTokenTtl: string;
-    refreshTokenTtl: string;
-    accessTokenFlag: string;
-    refreshTokenFlag: string;
-  }>("jwt");
+  config.get<jwtOptionsType>("jwt");
 
 export async function generateJwtToken(
   user: UserDocument,

@@ -3,17 +3,14 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import fsPromises from "fs/promises";
 import path from "path";
 import config from "config";
+import _ from "lodash";
 
 import { log } from "../utils";
 import { redisClient } from "../db/redis";
+import { jwtOptionsType } from "../../config/default";
 
 const { accessTokenTtl, refreshTokenTtl, accessTokenFlag, refreshTokenFlag } =
-  config.get<{
-    accessTokenTtl: string;
-    refreshTokenTtl: string;
-    accessTokenFlag: string;
-    refreshTokenFlag: string;
-  }>("jwt");
+  config.get<jwtOptionsType>("jwt");
 
 export async function verifyAccessToken(
   req: Request,
@@ -21,6 +18,10 @@ export async function verifyAccessToken(
   next: NextFunction
 ): Promise<void> {
   try {
+    if (!_.has(req.headers, "authorization")) {
+      throw new Error("Missing a token in authorization header!");
+    }
+
     const accessToken = req.headers.authorization?.split(" ")[1];
 
     if (!accessToken) {
@@ -78,7 +79,7 @@ export async function verifyRefreshToken(
 
     return jwt.verify(refreshToken, publicRTKey, { algorithms: ["RS256"] });
   } catch (error: any) {
-    log.error(`${verifyRefreshToken.name}: ${error.message}`);
+    log.error(`${verifyRefreshToken.name}: ${error}`);
     return error;
   }
 }
