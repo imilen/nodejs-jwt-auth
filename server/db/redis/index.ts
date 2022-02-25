@@ -1,9 +1,11 @@
 import Redis from "ioredis";
 import config from "config";
+import bluebird from "bluebird";
 
 import { log } from "../../utils";
 import { redisOptionsType } from "../../../config/default";
 
+(Redis as any).Promise = bluebird;
 const redisOptions = config.get<redisOptionsType>("redis");
 
 class RedisClient {
@@ -32,7 +34,6 @@ class RedisClient {
         password: redisOptions.pass,
         db: redisOptions.db,
       });
-      this.redisClient.Promise = global.Promise;
       this.redisClient.on(`message`, (channel, message) => {
         log.info(`redis:message`, channel, message);
       });
