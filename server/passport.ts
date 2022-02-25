@@ -4,7 +4,8 @@ import {
   Strategy as JwtStrategy,
   VerifiedCallback,
 } from "passport-jwt";
-import fsPromises from "fs/promises";
+import fs from "fs";
+import pify from "pify";
 import path from "path";
 import config from "config";
 import _ from "lodash";
@@ -12,6 +13,7 @@ import _ from "lodash";
 import { User } from "./db/mongo/models";
 import { log } from "./utils";
 import { jwtOptionsType } from "../config/default";
+
 const {
   accessTokenTtl,
   refreshTokenTtl,
@@ -19,6 +21,8 @@ const {
   refreshTokenFlag,
   algorithms,
 } = config.get<jwtOptionsType>("jwt");
+
+const jwtKeysPath = path.join(__dirname, "certificate", "jwt");
 
 passport.serializeUser((user: any, cb) => {
   log.info(`passport:serializeUser ${JSON.stringify(user)}`);
@@ -48,13 +52,8 @@ passport.use(
             throw new Error("Missing a token in authorization header!");
           }
 
-          const publicATKey = await fsPromises.readFile(
-            path.join(
-              __dirname,
-              "certificate",
-              "jwt",
-              `rsa_public.${accessTokenFlag}.pem`
-            ),
+          const publicATKey = await pify(fs.readFile)(
+            path.join(jwtKeysPath, `rsa_public.${accessTokenFlag}.pem`),
             { encoding: "utf8" }
           );
           return cb(null, publicATKey);

@@ -2,8 +2,11 @@ import jwt from "jsonwebtoken";
 import config from "config";
 import _ from "lodash";
 import path from "path";
-import fsPromises from "fs/promises";
+import fs from "fs";
+import pify from "pify";
 import forge from "node-forge";
+
+const a = pify(fs).read;
 
 import { UserDocument } from "../db/mongo/models";
 import { log } from "../utils";
@@ -18,6 +21,8 @@ const {
   algorithms,
 } = config.get<jwtOptionsType>("jwt");
 
+const jwtKeysPath = path.join(__dirname, "..", "certificate", "jwt");
+
 export async function generateJwtToken(
   user: UserDocument,
   expiresIn: any,
@@ -30,13 +35,10 @@ export async function generateJwtToken(
     const { email, role } = _.pick(user, ["email", "role"]);
 
     const privateKeyFilePath = path.join(
-      __dirname,
-      "..",
-      "certificate",
-      "jwt",
+      jwtKeysPath,
       `rsa_private.${tokenFlag}.pem`
     );
-    const privateKey = await fsPromises.readFile(privateKeyFilePath, {
+    const privateKey = await pify(fs.readFile)(privateKeyFilePath, {
       encoding: "utf8",
     });
 
@@ -68,24 +70,18 @@ export function generateJwtKeys() {
       const privateKey = forge.pki.privateKeyToPem(keyPair.privateKey);
 
       const publicKeyFilePath = path.join(
-        __dirname,
-        "..",
-        "certificate",
-        "jwt",
+        jwtKeysPath,
         `rsa_public.${tokenFlag}.pem`
       );
-      await fsPromises.writeFile(publicKeyFilePath, publicKey, {
+      await pify(fs.writeFile)(publicKeyFilePath, publicKey, {
         encoding: "utf8",
       });
 
       const privateKeyFilePath = path.join(
-        __dirname,
-        "..",
-        "certificate",
-        "jwt",
+        jwtKeysPath,
         `rsa_private.${tokenFlag}.pem`
       );
-      await fsPromises.writeFile(privateKeyFilePath, privateKey, {
+      await pify(fs.writeFile)(privateKeyFilePath, privateKey, {
         encoding: "utf8",
       });
     });
