@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
+import bluebird from "bluebird";
 
 import { log } from "../../utils";
 import { User } from "./models";
 
-mongoose.Promise = global.Promise;
+mongoose.Promise = bluebird.Promise;
 mongoose.set("debug", false);
 
 export const mongoConnect = async (uri: string, options: object) => {

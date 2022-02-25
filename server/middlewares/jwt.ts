@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import fsPromises from "fs/promises";
+import fs from "fs";
+import pify from "pify";
 import path from "path";
 import config from "config";
 import _ from "lodash";
@@ -16,6 +17,8 @@ const {
   refreshTokenFlag,
   algorithms,
 } = config.get<jwtOptionsType>("jwt");
+
+const jwtKeysPath = path.join(__dirname, "..", "certificate", "jwt");
 
 export async function verifyAccessToken(
   req: Request,
@@ -39,14 +42,8 @@ export async function verifyAccessToken(
       throw new Error("The token is blocked!");
     }
 
-    const publicATKey = await fsPromises.readFile(
-      path.join(
-        __dirname,
-        "..",
-        "certificate",
-        "jwt",
-        `rsa_public.${accessTokenFlag}.pem`
-      ),
+    const publicATKey = await pify(fs.readFile)(
+      path.join(jwtKeysPath, `rsa_public.${accessTokenFlag}.pem`),
       { encoding: "utf8" }
     );
 
@@ -71,14 +68,8 @@ export async function verifyRefreshToken(
   refreshToken: string
 ): Promise<string | JwtPayload> {
   try {
-    const publicRTKey = await fsPromises.readFile(
-      path.join(
-        __dirname,
-        "..",
-        "certificate",
-        "jwt",
-        `rsa_public.${refreshTokenFlag}.pem`
-      ),
+    const publicRTKey = await pify(fs.readFile)(
+      path.join(jwtKeysPath, `rsa_public.${refreshTokenFlag}.pem`),
       { encoding: "utf8" }
     );
 
