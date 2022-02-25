@@ -2,13 +2,8 @@ import Redis from "ioredis";
 import config from "config";
 
 import { log } from "../../utils";
+import { redisOptionsType } from "../../../config/default";
 
-export type redisOptionsType = {
-  host: string;
-  port: number;
-  pass: string;
-  db: number;
-};
 const redisOptions = config.get<redisOptionsType>("redis");
 
 class RedisClient {

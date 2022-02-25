@@ -12,17 +12,13 @@ import {
   verifyAccessToken,
   verifyRefreshToken,
 } from "../middlewares";
+import { jwtOptionsType } from "../../config/default";
 
 // extract configuration options
 const cookieSecretKey = config.get<string>("cookieSecretKey");
 const cookieName = config.get<string>("cookieName");
 const { accessTokenTtl, refreshTokenTtl, accessTokenFlag, refreshTokenFlag } =
-  config.get<{
-    accessTokenTtl: string;
-    refreshTokenTtl: string;
-    accessTokenFlag: string;
-    refreshTokenFlag: string;
-  }>("jwt");
+  config.get<jwtOptionsType>("jwt");
 
 const user = Router();
 

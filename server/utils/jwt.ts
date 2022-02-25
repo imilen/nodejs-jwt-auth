@@ -7,15 +7,16 @@ import forge from "node-forge";
 
 import { UserDocument } from "../db/mongo/models";
 import { log } from "../utils";
+import { jwtOptionsType } from "../../config/default";
 
 // extract configuration options
-const { accessTokenTtl, refreshTokenTtl, accessTokenFlag, refreshTokenFlag } =
-  config.get<{
-    accessTokenTtl: string;
-    refreshTokenTtl: string;
-    accessTokenFlag: string;
-    refreshTokenFlag: string;
-  }>("jwt");
+const {
+  accessTokenTtl,
+  refreshTokenTtl,
+  accessTokenFlag,
+  refreshTokenFlag,
+  algorithms,
+} = config.get<jwtOptionsType>("jwt");
 
 export async function generateJwtToken(
   user: UserDocument,
@@ -44,7 +45,7 @@ export async function generateJwtToken(
       issuer: "localhost",
       audience: "localhost",
       subject: email,
-      algorithm: "RS256",
+      algorithm: algorithms[0],
     });
 
     if (!jwtToken) {

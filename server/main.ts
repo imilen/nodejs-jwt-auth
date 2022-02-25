@@ -1,15 +1,16 @@
 import http from "http";
-import https from "https";
+// import https from "https";
 import config from "config";
 
 import { log } from "./utils";
 import { mongoConnect } from "./db/mongo";
 // import extractFromKS from "./certificate/https/generateKeys";
 import { app } from "./app";
+import { mongoOptionsType } from "../config/default";
 
 // extract configuration options
 const port = config.get<number>("port");
-const mongo = config.get<{ uri: string; options: object }>("mongo");
+const mongo = config.get<mongoOptionsType>("mongo");
 
 // http server
 const httpServer = http.createServer(app);
