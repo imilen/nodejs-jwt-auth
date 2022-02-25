@@ -9,8 +9,13 @@ import { log } from "../utils";
 import { redisClient } from "../db/redis";
 import { jwtOptionsType } from "../../config/default";
 
-const { accessTokenTtl, refreshTokenTtl, accessTokenFlag, refreshTokenFlag } =
-  config.get<jwtOptionsType>("jwt");
+const {
+  accessTokenTtl,
+  refreshTokenTtl,
+  accessTokenFlag,
+  refreshTokenFlag,
+  algorithms,
+} = config.get<jwtOptionsType>("jwt");
 
 export async function verifyAccessToken(
   req: Request,
@@ -77,7 +82,7 @@ export async function verifyRefreshToken(
       { encoding: "utf8" }
     );
 
-    return jwt.verify(refreshToken, publicRTKey, { algorithms: ["RS256"] });
+    return jwt.verify(refreshToken, publicRTKey, { algorithms: algorithms });
   } catch (error: any) {
     log.error(`${verifyRefreshToken.name}: ${error}`);
     return error;

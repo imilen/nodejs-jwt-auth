@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import { Algorithm } from "jsonwebtoken";
 
 dotenv.config({ encoding: "utf8" });
 
@@ -19,6 +20,7 @@ export type jwtOptionsType = {
   refreshTokenTtl: string;
   accessTokenFlag: string;
   refreshTokenFlag: string;
+  algorithms: Algorithm[];
 };
 
 export default {
@@ -42,5 +44,6 @@ export default {
     refreshTokenTtl: JSON.stringify(process.env.REFRESH_TOKEN_TTL) || "1h",
     accessTokenFlag: JSON.stringify(process.env.ACCESS_TOKEN_FLAG) || "at",
     refreshTokenFlag: JSON.stringify(process.env.REFRESH_TOKEN_FLAG) || "rt",
+    algorithms: ["RS256"],
   } as jwtOptionsType,
 };

@@ -12,8 +12,13 @@ import _ from "lodash";
 import { User } from "./db/mongo/models";
 import { log } from "./utils";
 import { jwtOptionsType } from "../config/default";
-const { accessTokenTtl, refreshTokenTtl, accessTokenFlag, refreshTokenFlag } =
-  config.get<jwtOptionsType>("jwt");
+const {
+  accessTokenTtl,
+  refreshTokenTtl,
+  accessTokenFlag,
+  refreshTokenFlag,
+  algorithms,
+} = config.get<jwtOptionsType>("jwt");
 
 passport.serializeUser((user: any, cb) => {
   log.info(`passport:serializeUser ${JSON.stringify(user)}`);
@@ -36,9 +41,8 @@ passport.use(
   new JwtStrategy(
     {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      algorithms: ["RS256"],
+      algorithms,
       secretOrKeyProvider: async (req, token, cb) => {
-        console.log(token);
         try {
           if (!token) {
             throw new Error("Missing a token in authorization header!");
@@ -59,7 +63,7 @@ passport.use(
           return cb(error);
         }
       },
-      jsonWebTokenOptions: { algorithms: ["RS256"] },
+      jsonWebTokenOptions: { algorithms: algorithms },
     },
     async (payload: any, cb: VerifiedCallback) => {
       try {
