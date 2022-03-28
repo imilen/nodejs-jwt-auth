@@ -3,7 +3,7 @@ import config from "config";
 import bluebird from "bluebird";
 
 import { log } from "../../utils";
-import { redisOptionsType } from "../../../config/default";
+import { redisOptionsType } from "../../../config/common";
 
 (Redis as any).Promise = bluebird;
 const redisOptions = config.get<redisOptionsType>("redis");

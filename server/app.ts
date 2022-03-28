@@ -15,7 +15,7 @@ import passport from "passport";
 import { generateJwtKeys } from "./utils";
 import { redisClient } from "./db/redis";
 import { admin, home, user } from "./routes";
-import { jwtOptionsType, mongoOptionsType } from "../config/default";
+import { jwtOptionsType, mongoOptionsType } from "../config/common";
 
 // extract configuration options
 const cookieSecretKey = config.get<string>("cookieSecretKey");

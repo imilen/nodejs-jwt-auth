@@ -10,7 +10,7 @@ const a = pify(fs).read;
 
 import { UserDocument } from "../db/mongo/models";
 import { log } from "../utils";
-import { jwtOptionsType } from "../../config/default";
+import { jwtOptionsType } from "../../config/common";
 
 // extract configuration options
 const {
